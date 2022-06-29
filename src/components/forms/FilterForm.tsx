@@ -41,7 +41,7 @@ const FilterForm = ({ columnLabels, onSubmit }: Props) => (
     initialValues={initialValues}
     onSubmit={onSubmit}
     validationSchema={schema}
-  >
+    >
     {({
       handleChange,
       handleBlur,
