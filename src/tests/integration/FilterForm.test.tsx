@@ -1,10 +1,7 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FilterForm from "../../components/forms/FilterForm"
-
-import type { NumericPlanetValues } from "../../models/Planet";
-import ComparisonEnum from "../../models/enum/Comparison.enum";
 
 const columnLabels = {
   diameter: "Diâmetro",
@@ -20,22 +17,18 @@ const operationsLabels = {
   LOWER_THAN: "Menor que",
 };
 
-type Values = {
-  column: keyof NumericPlanetValues;
-  comparison: ComparisonEnum;
-  value: number;
-};
+const onSubmitMock = jest.fn();
+
+beforeEach(() => {
+  render(
+    <FilterForm
+      columnLabels={columnLabels}
+      onSubmit={onSubmitMock}
+    />
+  );
+});
 
 describe("covarage 80% of FilterForm", () => {
-  beforeEach(() => {
-    render(
-      <FilterForm
-        columnLabels={ columnLabels }
-        onSubmit={ (values: Values) => values }
-      />
-    );
-  });
-
   it("should render two combo box and one spin button, all elements needs starting with a default value", () => {
     const comboBoxArr = screen.getAllByRole("combobox");
     expect(comboBoxArr).toHaveLength(2);
@@ -63,7 +56,7 @@ describe("covarage 80% of FilterForm", () => {
     expect(spinButton).toHaveValue(0);
   });
 
-  it("must be possible to interact with the elements", () => {
+  it("must be possible to interact with the elements", async () => {
     const comboBoxArr = screen.getAllByRole("combobox");
     const [columnComboBox, comparisonComboBox] = comboBoxArr;
 
@@ -78,5 +71,8 @@ describe("covarage 80% of FilterForm", () => {
     const spinButton = screen.getByRole("spinbutton");
     userEvent.type(spinButton, "100");
     expect(spinButton).toHaveValue(100);
+    const submitButton = screen.getByRole("button", { name: "Incluir filtro" });
+    userEvent.click(submitButton);
+    await waitFor(() => expect(onSubmitMock).toHaveBeenCalledTimes(1));
   });
 })
